@@ -333,7 +333,7 @@ class VariableCollection(object):
 # targets is the single TargetCollection instance created for this invokation
 # of pake
 targets = TargetCollection()
-# rules is a d9ct of regular expressions to @rules where dynamically created
+# rules is a dict of regular expressions to @rules where dynamically created
 # rules are registered.
 rules = {}
 # variables is the global set of substitution variables, where the first setter
@@ -459,7 +459,7 @@ def virtual(name, *dependencies, **kwargs):
     """virtual targets are metatargets.  They do not correspond to any real
     file in the filesystem, even if a file with the same name already exists.
     Virtual targets can be thought of as only existing for the duration of the
-    build.   Their up-to-dateness or otherwise is independent of any existance
+    build.   Their up-to-dateness or otherwise is independent of any existence
     or up-to-dateness of any actual file in the filesystem.  Typically they are
     used to group actions such as "all", "build", or "test"."""
     target = Target(name, dependencies=dependencies, clean=False, phony=True,
