@@ -71,6 +71,15 @@ class DuplicateTargetError(PakeError):
         return 'duplicate target %r' % (self.target.name,)
 
 
+class UnknownTargetError(PakeError):
+
+    def __init__(self, name):
+        self.name = name
+
+    def __str__(self):
+        return 'unknown target %r' % (self.name,)
+
+
 class Target(object):
     """Target is the core object of pake.  It includes all of the target's name
     (which may or may not correspond to a real file in the filesystem, see the
@@ -292,7 +301,10 @@ class TargetCollection(object):
                 raise AmbiguousRuleError(name)
             target = f(name, match)
         if target is None:
-            target = Target(name, precious=True)
+            if os.path.exists(name):
+                target = Target(name, precious=True)
+            else:
+                raise UnknownTargetError(name)
         self.targets[name] = target
         return target
 
