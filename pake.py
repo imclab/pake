@@ -371,10 +371,10 @@ def ifind(*paths):
     for path in paths:
         for dirpath, dirnames, names in os.walk(path):
             for name in names:
-                if sys.platform == 'win32':
-                    yield '/'.join(dirpath.split('\\') + [name])
-                else:
+                if os.sep == '/':
                     yield os.path.join(dirpath, name)
+                else:
+                    yield '/'.join(dirpath.split(os.sep) + [name])
 
 
 def main(argv=sys.argv):
