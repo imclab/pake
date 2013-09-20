@@ -88,11 +88,14 @@ class Target(object):
     metadata."""
 
     def __init__(self, name, action=None, clean=True, dependencies=(),
-                 makedirs=True, phony=False, precious=False):
+                 help=None, help_group=None, makedirs=True, phony=False,
+                 precious=False):
         self.name = name
         self.action = action
         self._clean = clean
         self.dependencies = list(flatten(dependencies))
+        self.help = help
+        self.help_group = help_group
         self._makedirs = makedirs
         self.phony = phony
         self.precious = precious
@@ -308,6 +311,25 @@ class TargetCollection(object):
         self.targets[name] = target
         return target
 
+    def format_epilog(self, formatter):
+        helps_by_help_group = collections.defaultdict(dict)
+        max_name_len = 0
+        for name in sorted(self.targets):
+            target = self.targets[name]
+            if target.help is not None:
+                helps_by_help_group[target.help_group][name] = target.help
+                max_name_len = max(max_name_len, len(name))
+        lines = []
+        lines.append('Targets:\n')
+        format = '  %%-%ds  %%s\n' % (max_name_len,)
+        for help_group in sorted(helps_by_help_group.keys()):
+            helps = helps_by_help_group[help_group]
+            if help_group is not None:
+                lines.append('%s targets:\n' % (help_group,))
+            for name in sorted(helps.keys()):
+                lines.append(format % (name, helps[name]))
+        return ''.join(lines)
+
 
 class VariableCollection(object):
     """VariableCollection implements an object with properties where the first
@@ -390,6 +412,7 @@ def main(argv=sys.argv):
     option_parser.add_option('-v', '--verbose',
                              action='count', dest='logging_level')
     option_parser.set_defaults(logging_level=0)
+    option_parser.format_epilog = targets.format_epilog
     options, args = option_parser.parse_args(argv[1:])
     logging.basicConfig(format='%(asctime)s %(name)s: %(message)s',
                         level=logging.INFO - 10 * options.logging_level)
