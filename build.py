@@ -11,7 +11,7 @@ virtual('all', 'pep8', 'pyflakes')
 
 @target('pep8', SRC, phony=True)
 def pep8(t):
-    t.run('pep8', SRC)
+    t.run('pep8', '--ignore=E501', SRC)
 
 
 @target('pyflakes', SRC, phony=True)
